@@ -1,0 +1,11 @@
+chromadb
+groq
+fashion-clip
+torch
+pillow
+flask
+werkzeug
+fastapi
+uvicorn
+requests
+python-multipart

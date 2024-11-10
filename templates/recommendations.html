@@ -1,0 +1,390 @@
+{% extends "base.html" %}
+
+{% block title %}Outfit Recommendations{% endblock %}
+
+{% block extra_css %}
+<style>
+    .recommendations-container {
+        max-width: 1200px;
+        margin: 0 auto;
+    }
+
+    .recommendations-header {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 2rem;
+    }
+
+    .recommendations-header h1 {
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+    }
+
+    .recommendation-options {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .option-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        text-align: center;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+    }
+
+    .option-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .option-icon {
+        font-size: 2rem;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+    }
+
+    .outfit-display {
+        display: none;
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-top: 2rem;
+    }
+
+    .outfit-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
+        margin-top: 1.5rem;
+    }
+
+    .outfit-item {
+        text-align: center;
+    }
+
+    .outfit-image {
+        width: 100%;
+        height: 400px;
+        object-fit: cover;
+        border-radius: 8px;
+        margin-bottom: 1rem;
+    }
+
+    .outfit-info {
+        padding: 1rem;
+    }
+
+    .outfit-title {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: var(--text-color);
+        margin-bottom: 0.5rem;
+    }
+
+    .outfit-description {
+        color: var(--light-text);
+        margin-bottom: 0.5rem;
+    }
+
+    .outfit-type {
+        display: inline-block;
+        padding: 0.25rem 0.75rem;
+        background-color: var(--primary-color);
+        color: white;
+        border-radius: 20px;
+        font-size: 0.8rem;
+    }
+
+    .text-input-section {
+        display: none;
+        margin-top: 2rem;
+    }
+
+    .text-input-container {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .text-input {
+        flex: 1;
+        padding: 0.75rem;
+        border: 1px solid #dee2e6;
+        border-radius: 8px;
+    }
+
+    .loading {
+        display: none;
+        text-align: center;
+        padding: 2rem;
+    }
+
+    .error-message {
+        color: var(--accent-color);
+        text-align: center;
+        margin: 1rem 0;
+        display: none;
+    }
+
+    .items-table-container {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-top: 2rem;
+    }
+
+    .items-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+    }
+
+    .item-card {
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+
+    .item-card:hover {
+        transform: translateY(-5px);
+    }
+
+    .item-image {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
+
+    .item-info {
+        padding: 1rem;
+    }
+
+    .item-info h4 {
+        margin: 0;
+        font-size: 1rem;
+        color: var(--text-color);
+    }
+
+    .item-type {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        background-color: var(--primary-color);
+        color: white;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        margin-top: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="recommendations-container">
+    <div class="recommendations-header">
+        <h1>Outfit Recommendations</h1>
+        <p>Get personalized outfit suggestions based on your wardrobe</p>
+    </div>
+
+    <div class="recommendation-options">
+        <div class="option-card" onclick="getRandomRecommendation()">
+            <div class="option-icon">🎲</div>
+            <h3>Random Outfit</h3>
+            <p>Get a randomly generated outfit combination</p>
+        </div>
+        <div class="option-card" onclick="showTextInput()">
+            <div class="option-icon">💭</div>
+            <h3>Text-Based</h3>
+            <p>Describe your outfit preferences</p>
+        </div>
+        <div class="option-card" onclick="showItemSelection()">
+            <div class="option-icon">👔</div>
+            <h3>Item-Based</h3>
+            <p>Select an item from your wardrobe</p>
+        </div>
+    </div>
+
+    <div class="text-input-section">
+        <div class="text-input-container">
+            <input type="text" class="text-input" placeholder="Describe your outfit preference (e.g., 'casual summer outfit' or 'formal business attire')">
+            <button class="btn btn-primary" onclick="getTextBasedRecommendation()">Get Suggestion</button>
+        </div>
+    </div>
+
+    <div class="item-selection-section" style="display: none;">
+        <div class="items-table-container">
+            <h3>Select an Item from Your Wardrobe</h3>
+            <div class="items-grid">
+                {% for item in items %}
+                <div class="item-card" onclick="getRecommendationForApparel('{{ item.image_id }}', '{{ item.description }}', '{{ item.apparel_type }}')">
+                    <img src="{{ url_for('static', filename=item.path) }}" alt="{{ item.title }}" class="item-image">
+                    <div class="item-info">
+                        <h4>{{ item.title }}</h4>
+                        <span class="item-type">{{ item.apparel_type }}</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="loading">
+        <span class="loader"></span>
+        <p>Generating your outfit recommendation...</p>
+    </div>
+
+    <div class="error-message"></div>
+
+    <div class="outfit-display">
+        <h2>Recommended Outfit</h2>
+        <div class="outfit-grid">
+            <div class="outfit-item">
+                <img src="" alt="" class="outfit-image base-image">
+                <div class="outfit-info">
+                    <h3 class="outfit-title base-title"></h3>
+                    <p class="outfit-description base-description"></p>
+                    <span class="outfit-type base-type"></span>
+                </div>
+            </div>
+            <div class="outfit-item">
+                <img src="" alt="" class="outfit-image recommended-image">
+                <div class="outfit-info">
+                    <h3 class="outfit-title recommended-title"></h3>
+                    <p class="outfit-description recommended-description"></p>
+                    <span class="outfit-type recommended-type"></span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+async function getRandomRecommendation() {
+    showLoading();
+    try {
+        const response = await fetch('/get-random-recommendation');
+        const data = await response.json();
+        if (data.status === 'success') {
+            displayOutfit(data);
+        } else {
+            showError(data.error);
+        }
+    } catch (error) {
+        showError('Failed to get recommendation');
+    }
+    hideLoading();
+}
+
+async function getTextBasedRecommendation() {
+    const input = document.querySelector('.text-input').value.trim();
+    if (!input) {
+        showError('Please enter your outfit preference');
+        return;
+    }
+
+    showLoading();
+    try {
+        const response = await fetch('/get-recommendation-for-text', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ input_text: input })
+        });
+        const data = await response.json();
+        if (data.status === 'success') {
+            displayOutfit(data);
+        } else {
+            showError(data.error);
+        }
+    } catch (error) {
+        showError('Failed to get recommendation');
+    }
+    hideLoading();
+}
+
+function displayOutfit(data) {
+    document.querySelector('.base-image').src = data.base_item.image_url;
+    document.querySelector('.base-title').textContent = data.base_item.title;
+    document.querySelector('.base-description').textContent = data.base_item.description;
+    document.querySelector('.base-type').textContent = data.base_item.type;
+
+    document.querySelector('.recommended-image').src = data.recommended_item.image_url;
+    document.querySelector('.recommended-title').textContent = data.recommended_item.title;
+    document.querySelector('.recommended-description').textContent = data.recommended_item.description;
+    document.querySelector('.recommended-type').textContent = data.recommended_item.type;
+
+    document.querySelector('.outfit-display').style.display = 'block';
+    document.querySelector('.error-message').style.display = 'none';
+}
+
+function showTextInput() {
+    document.querySelector('.text-input-section').style.display = 'block';
+    document.querySelector('.outfit-display').style.display = 'none';
+    document.querySelector('.error-message').style.display = 'none';
+}
+
+function showLoading() {
+    document.querySelector('.loading').style.display = 'block';
+    document.querySelector('.outfit-display').style.display = 'none';
+    document.querySelector('.error-message').style.display = 'none';
+}
+
+function hideLoading() {
+    document.querySelector('.loading').style.display = 'none';
+}
+
+function showError(message) {
+    const errorElement = document.querySelector('.error-message');
+    errorElement.textContent = message;
+    errorElement.style.display = 'block';
+    document.querySelector('.outfit-display').style.display = 'none';
+}
+
+function showItemSelection() {
+    document.querySelector('.text-input-section').style.display = 'none';
+    document.querySelector('.outfit-display').style.display = 'none';
+    document.querySelector('.error-message').style.display = 'none';
+    document.querySelector('.item-selection-section').style.display = 'block';
+}
+
+async function getRecommendationForApparel(imageId, description, apparelType) {
+    showLoading();
+    try {
+        const response = await fetch('/get-recommendation-for-apparel', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                imageId: imageId,
+                description: description,
+                apparelType: apparelType
+            })
+        });
+        const data = await response.json();
+        if (data.status === 'success') {
+            displayOutfit(data);
+            document.querySelector('.item-selection-section').style.display = 'none';
+        } else {
+            showError(data.error);
+        }
+    } catch (error) {
+        showError('Failed to get recommendation');
+    }
+    hideLoading();
+}
+</script>
+{% endblock %} 
