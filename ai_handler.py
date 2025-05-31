@@ -14,7 +14,7 @@ import datetime
 import random
 
 # Initialize clients and models
-client = Groq(api_key="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")
+client = Groq(api_key="")
 fclip = FashionCLIP('fashion-clip')
 chroma_client = chromadb.Client(Settings(
     persist_directory="./vector_db",
