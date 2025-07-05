@@ -4,16 +4,16 @@ Welcome to WearWiz! This project combines advanced AI capabilities to help you m
 🌟 Objectives
 The WearWiz project aims to create an AI-driven system with the following key objectives:
 
-1.Segmentation and Classification
+1. Segmentation and Classification
 Accurately segment and classify clothing items within user-uploaded images, identifying various wardrobe components such as tops, bottoms, and accessories.
 
-2.Daily Recommendations
+2. Daily Recommendations
 Provide daily, personalized outfit suggestions based on user-defined preferences, contextual factors (like weather and occasion), and the compatibility of items within the wardrobe.
 
-3.Outfit Generation
+3. Outfit Generation
 Generate a diverse array of outfit combinations to maximize wardrobe utility, encouraging users to discover new ways to style existing pieces.
 
-4.Future Extensions
+4. Future Extensions
 Enable potential expansions in sustainable fashion recommendations, eco-conscious choices through carbon footprint tracking, and integration with e-commerce platforms for targeted purchases.
 
 🚀 Getting Started
